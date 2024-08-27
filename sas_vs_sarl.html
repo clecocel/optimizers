@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparateur SARL vs SAS - Salaire net et droits à la retraite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .container {
+            max-width: 800px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+        #totalCostInput {
+            text-align: right;
+            width: 200px;
+        }
+        .disclaimer {
+            font-style: italic;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alert alert-info disclaimer mb-4">
+            Les calculs présentés sont à titre indicatif. Les résultats peuvent varier en fonction de votre situation personnelle et fiscale.
+        </div>
+        <h1 class="mb-4">Comparateur SARL vs SAS - Salaire net et droits à la retraite</h1>
+        <form id="comparisonForm">
+            <div class="mb-3">
+                <label for="totalCostInput" class="form-label">Coût total disponible pour la rémunération :</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" id="totalCostInput" class="form-control me-2" required>
+                    <button type="submit" class="btn btn-primary" id="compareButton">Comparer</button>
+                    <div class="ms-2">
+                        <button type="button" class="btn btn-link p-0" data-bs-toggle="popover" data-bs-placement="right" data-bs-html="true" data-bs-content="Si vous ne savez pas comment calculer le coût total pour une SAS, utilisez notre simulateur de base : <a href='basic_simulator.html'>Simulateur de base</a>">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <div id="result" class="mt-4" style="display: none;">
+            <h2>Résultats de la comparaison</h2>
+            <canvas id="comparisonChart"></canvas>
+            <div id="comparisonDetails" class="mt-4"></div>
+        </div>
+        <div id="loading" class="mt-4" style="display: none;">
+            <p>Analyse en cours, veuillez patienter...</p>
+            <div class="progress">
+                <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+        </div>
+        <div id="error" class="mt-4 alert alert-danger" style="display: none;"></div>
+    </div>
+
+    <script>
+        let comparisonChart = null; // Declare this variable at the top of your script, outside any function
+
+        $(document).ready(function() {
+            $('#totalCostInput').on('input', function() {
+                let value = $(this).val().replace(/[^0-9]/g, '');
+                if (value) {
+                    value = parseInt(value, 10);
+                    $(this).val(value.toLocaleString('fr-FR') + ' €');
+                }
+            });
+
+            $('#comparisonForm').on('submit', function(e) {
+                e.preventDefault();
+                const totalCost = parseInt($('#totalCostInput').val().replace(/[^0-9]/g, ''));
+                $('#result').hide();
+                $('#comparisonDetails').empty();
+                $('#loading').show();
+                $('#error').hide();
+                compareStatuses(totalCost);
+            });
+
+            // Initialize popovers
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl, {
+                    trigger: 'focus'
+                })
+            })
+
+            // Close popover when clicking outside
+            $(document).on('click', function (e) {
+                $('[data-bs-toggle="popover"]').each(function () {
+                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    }
+                });
+            });
+        });
+
+        function compareStatuses(totalCost) {
+            const apiUrl = 'https://mon-entreprise.urssaf.fr/api/v1/evaluate';
+            const results = {
+                SARL: [],
+                SAS: []
+            };
+
+            Promise.all([
+                calculateSARL(apiUrl, totalCost, results),
+                calculateSAS(apiUrl, totalCost, results)
+            ]).then(() => {
+                displayResults(results, totalCost);
+            }).catch((error) => {
+                console.error('Error in calculations:', error);
+                $('#loading').hide();
+                $('#error').show().text('Une erreur est survenue lors de l\'analyse. Veuillez réessayer plus tard.');
+            });
+        }
+
+        function calculateSARL(apiUrl, totalCost, results) {
+            const data = {
+                "expressions": [
+                    "dirigeant . rémunération . net",
+                    "dirigeant . rémunération . net . après impôt",
+                    "protection sociale . retraite . base",
+                    "protection sociale . retraite . complémentaire . RCI"
+                ],
+                "situation": {
+                    "entreprise . imposition": "'IS'",
+                    "entreprise . associés": "'unique'",
+                    "entreprise . catégorie juridique": "'SARL'",
+                    "dirigeant . rémunération . totale": totalCost
+                }
+            };
+
+            return $.ajax({
+                url: apiUrl,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data)
+            }).then(function(response) {
+                const netSalary = response.evaluate[0].nodeValue;
+                const netSalaryAfterTax = response.evaluate[1].nodeValue;
+                const baseRetirementMonthlyAmount = response.evaluate[2].nodeValue;
+                const complementaryRetirementAmount = response.evaluate[3].nodeValue * 43;
+                results.SARL.push({
+                    salary: totalCost,
+                    netSalary: netSalary,
+                    netSalaryAfterTax: netSalaryAfterTax,
+                    baseRetirementYearlyAmount: baseRetirementMonthlyAmount * 12,
+                    complementaryRetirementAmount: complementaryRetirementAmount
+                });
+            });
+        }
+
+        function calculateSAS(apiUrl, totalCost, results) {
+            const data = {
+                "expressions": [
+                    "salarié . rémunération . net",
+                    "salarié . rémunération . net . payé après impôt",
+                    "protection sociale . retraite . base",
+                    "protection sociale . retraite . complémentaire"
+                ], "situation": {
+                    "dirigeant . rémunération . totale": totalCost,
+                    "entreprise . catégorie juridique": "'SAS'"
+                }
+            };
+
+            return $.ajax({
+                url: apiUrl,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data)
+            }).then(function(response) {
+                const netSalary = response.evaluate[0].nodeValue * 12;
+                const netSalaryAfterTax = response.evaluate[1].nodeValue * 12;
+                const baseRetirementMonthlyAmount = response.evaluate[2].nodeValue;
+                const complementaryRetirementAmount = response.evaluate[3].nodeValue * 4.3 * 12;
+                results.SAS.push({
+                    salary: totalCost,
+                    netSalary: netSalary,
+                    netSalaryAfterTax: netSalaryAfterTax,
+                    baseRetirementYearlyAmount: baseRetirementMonthlyAmount * 12,
+                    complementaryRetirementAmount: complementaryRetirementAmount
+                });
+            });
+        }
+
+        function displayResults(results, totalCost) {
+            // Destroy the existing chart if it exists
+            if (comparisonChart) {
+                comparisonChart.destroy();
+            }
+
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            comparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['SARL', 'SAS'],
+                    datasets: [
+                        {
+                            label: 'Salaire net',
+                            data: [results.SARL[0].netSalary, results.SAS[0].netSalary],
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgb(75, 192, 192)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Salaire net après impôt',
+                            data: [results.SARL[0].netSalaryAfterTax, results.SAS[0].netSalaryAfterTax],
+                            backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                            borderColor: 'rgb(153, 102, 255)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Retraite base',
+                            data: [results.SARL[0].baseRetirementYearlyAmount, results.SAS[0].baseRetirementYearlyAmount],
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Retraite complémentaire',
+                            data: [results.SARL[0].complementaryRetirementAmount, results.SAS[0].complementaryRetirementAmount],
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Montant en euros'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            $('#comparisonDetails').html(`
+                <h3>Détails de la comparaison</h3>
+                <table class="table">
+                    <thead>
+                        <tr class="table-primary">
+                            <th scope="col"></th>
+                            <th scope="col">SARL</th>
+                            <th scope="col">SAS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Coût total</th>
+                            <td>${totalCost.toLocaleString('fr-FR')} €/an</td>
+                            <td>${totalCost.toLocaleString('fr-FR')} €/an</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Salaire net</th>
+                            <td>${Math.round(results.SARL[0].netSalary).toLocaleString('fr-FR')} €/an</td>
+                            <td>${Math.round(results.SAS[0].netSalary).toLocaleString('fr-FR')} €/an</td>
+                        </tr>
+                        <tr class="table-secondary">
+                            <th scope="row">Salaire net après impôt</th>
+                            <td>${Math.round(results.SARL[0].netSalaryAfterTax).toLocaleString('fr-FR')} €/an</td>
+                            <td>${Math.round(results.SAS[0].netSalaryAfterTax).toLocaleString('fr-FR')} €/an</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Retraite base</th>
+                            <td>${Math.round(results.SARL[0].baseRetirementYearlyAmount).toLocaleString('fr-FR')} €/an</td>
+                            <td>${Math.round(results.SAS[0].baseRetirementYearlyAmount).toLocaleString('fr-FR')} €/an</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Retraite complémentaire</th>
+                            <td>${Math.round(results.SARL[0].complementaryRetirementAmount).toLocaleString('fr-FR')} €/an</td>
+                            <td>${Math.round(results.SAS[0].complementaryRetirementAmount).toLocaleString('fr-FR')} €/an</td>
+                        </tr>
+                        <tr class="table-secondary">
+                            <th scope="row">Retraite totale (base + complémentaire)</th>
+                            <td>${Math.round(results.SARL[0].baseRetirementYearlyAmount + results.SARL[0].complementaryRetirementAmount).toLocaleString('fr-FR')} €/an</td>
+                            <td>${Math.round(results.SAS[0].baseRetirementYearlyAmount + results.SAS[0].complementaryRetirementAmount).toLocaleString('fr-FR')} €/an</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="alert alert-info mt-4">
+                    <h5>Avertissement sur les calculs de retraite</h5>
+                    <p>Les montants de retraite présentés ci-dessus sont basés sur les hypothèses suivantes :</p>
+                    <ul>
+                        <li>Une carrière complète de 43 ans au même niveau de salaire.</li>
+                        <li>Les calculs ne prennent pas en compte les évolutions potentielles de salaire ou les changements de statut au cours de la carrière.</li>
+                    </ul>
+                    <p>Ces calculs sont fournis à titre indicatif pour illustrer les mécanismes et les variations des droits sociaux selon le statut choisi (SARL ou SAS). Ils ne doivent pas être considérés comme une projection précise des droits à la retraite.</p>
+                    <p>Pour une estimation plus précise de vos droits à la retraite, nous vous recommandons de consulter un expert-comptable ou un conseiller en protection sociale.</p>
+                </div>
+            `);
+
+            $('#result').show();
+            $('#loading').hide();
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

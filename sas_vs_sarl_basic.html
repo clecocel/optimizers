@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gain de rémunération en passant d'une SAS à une SARL</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .container {
+            max-width: 800px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-top: 50px;
+            margin-bottom: 50px; /* Added margin at the bottom */
+        }
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        #salaryInput {
+            text-align: right;
+            width: 200px; /* Reduced width of the input box */
+        }
+        .disclaimer {
+            font-style: italic;
+            color: #6c757d;
+        }
+        .coming-soon {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alert alert-info disclaimer mb-4">
+            Les calculs présentés sont à titre indicatif, les gains peuvent avoir des conséquences non modélisées comme par exemple des droits (retraite, maladie, etc.) inférieurs.
+            <br> Le calcul de l'imposition est réalisé sur une base simplifiée d'une personne célibataire sans enfant afin de montrer les impacts de l'imposition.
+        </div>
+        <h1 class="mb-4">Gain de rémunération en passant d'une SAS à une SARL</h1>
+        
+        <div id="followUpQuestion" class="mt-4">
+            <p id="questionText" class="fw-bold">Quel est votre salaire brut annuel actuel en tant que dirigeant de votre SAS ?</p>
+            <div class="d-flex align-items-center">
+                <input type="text" id="salaryInput" class="form-control me-2" required>
+                <button class="btn btn-primary" id="analyzeButton">Analyser</button>
+            </div>
+        </div>
+
+        <div id="result" class="mt-4" style="display: none;"></div>
+
+
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#salaryInput').on('input', function() {
+                let value = $(this).val().replace(/[^0-9]/g, '');
+                if (value) {
+                    value = parseInt(value, 10);
+                    $(this).val(value.toLocaleString('fr-FR') + ' €');
+                }
+            });
+
+            $('#analyzeButton').on('click', submitSalary);
+
+            // Added event listener for Enter key press
+            $('#salaryInput').on('keypress', function(e) {
+                if (e.which === 13) { // Enter key code
+                    e.preventDefault();
+                    submitSalary();
+                }
+            });
+        });
+
+        function submitSalary() {
+            const yearlySalary = parseInt($('#salaryInput').val().replace(/[^0-9]/g, ''));
+            const apiUrl = 'https://mon-entreprise.urssaf.fr/api/v1/evaluate';
+            const monthlySalary = Math.round(yearlySalary / 12);
+
+            // Calculate SAS data
+            const sasData = {
+                "expressions": [
+                    "dirigeant . rémunération . totale",
+                    "salarié . rémunération . net . à payer avant impôt",
+                    "salarié . rémunération . net . payé après impôt"
+                ],
+                "situation": {
+                    "salarié . contrat . salaire brut": monthlySalary,
+                    "entreprise . catégorie juridique": "'SAS'"
+                }
+            };
+
+            $.when(
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(sasData)
+                })
+            ).done(function(sasResponse) {
+                const yearlyTotalCost = sasResponse.evaluate[0].nodeValue;
+                const formattedYearlyTotalCost = yearlyTotalCost.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+                const monthlyNetSAS = sasResponse.evaluate[1].nodeValue;
+                const yearlyNetSAS = monthlyNetSAS * 12;
+                const formattedYearlyNetSAS = yearlyNetSAS.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+                const monthlyNetAfterTaxSAS = sasResponse.evaluate[2].nodeValue;
+                const yearlyNetAfterTaxSAS = monthlyNetAfterTaxSAS * 12;
+                const formattedYearlyNetAfterTaxSAS = yearlyNetAfterTaxSAS.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+
+                // Calculate SARL/EURL comparison
+                const sarlComparisonData = {
+                    "expressions": [
+                        "dirigeant . rémunération . net",
+                        "dirigeant . rémunération . net . après impôt"
+                    ],
+                    "situation": {
+                        "entreprise . imposition": "'IS'",
+                        "entreprise . associés": "'unique'",
+                        "entreprise . catégorie juridique": "'SARL'",
+                        "dirigeant . rémunération . totale": Math.round(yearlyTotalCost)
+                    }
+                };
+
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(sarlComparisonData)
+                }).done(function(sarlResponse) {
+                    const yearlyNetSarl = sarlResponse.evaluate[0].nodeValue;
+                    const formattedYearlyNetSarl = yearlyNetSarl.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+                    const yearlyNetAfterTaxSarl = sarlResponse.evaluate[1].nodeValue;
+                    const formattedYearlyNetAfterTaxSarl = yearlyNetAfterTaxSarl.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+
+                    const gainSarl = yearlyNetAfterTaxSarl - yearlyNetAfterTaxSAS;
+                    const formattedGainSarl = gainSarl.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+
+                    $('#result').html(`
+                        <table class="table table-striped table-hover">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Statut</th>
+                                    <th>Coût total employeur annuel</th>
+                                    <th>Salaire net annuel</th>
+                                    <th>Salaire net après impôt annuel</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>SAS/SASU</td>
+                                    <td>${formattedYearlyTotalCost}</td>
+                                    <td>${formattedYearlyNetSAS}</td>
+                                    <td>${formattedYearlyNetAfterTaxSAS}</td>
+                                </tr>
+                                <tr>
+                                    <td>SARL/EURL</td>
+                                    <td>${formattedYearlyTotalCost}</td>
+                                    <td>${formattedYearlyNetSarl}</td>
+                                    <td>${formattedYearlyNetAfterTaxSarl}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="alert alert-success mt-4">
+                            Gain potentiel en passant à une SARL/EURL : <strong>${formattedGainSarl} / an.</strong> après impôt.
+                        </div>
+                        <div class="card mt-4 bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Découvrez notre Simulateur Premium</h5>
+                                <p class="card-text">Pour une analyse plus approfondie et personnalisée, notre Simulateur Premium offre des fonctionnalités avancées :</p>
+                                <ul>
+                                    <li>Comparaison détaillée des droits à la retraite selon le statut choisi</li>
+                                    <li>Optimisation de la répartition entre dividendes et salaire</li>
+                                    <li>Simulation multi-années pour une vision à long terme</li>
+                                </ul>
+                                <a href="#" class="btn btn-primary">Accéder au Simulateur Premium</a>
+                            </div>
+                        </div>
+                    `).show();
+
+                }).fail(function(xhr, status, error) {
+                    console.error('Error in SARL comparison:', error);
+                    $('#result').append('<div class="alert alert-danger">Une erreur s\'est produite lors du calcul de la comparaison SARL.</div>');
+                });
+            }).fail(function(xhr, status, error) {
+                console.error('Error:', error);
+                $('#result').html('<div class="alert alert-danger">Une erreur s\'est produite lors du calcul des coûts.</div>').show();
+            });
+        }
+    </script>
+</body>
+</html>
