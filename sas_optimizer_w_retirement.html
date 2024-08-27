@@ -68,7 +68,7 @@
     <footer class="mt-4 text-center text-muted">
         <p>Les calculs sont faits à partir du moteur de <a href="https://mon-entreprise.urssaf.fr/" target="_blank">mon-entreprise.urssaf.fr</a></p>
     </footer>
-    
+
     <script>
         let chart;
 
@@ -294,6 +294,16 @@
                 <p>Meilleure option fiscale : ${bestOption.totalNetAfterTaxPFU > bestOption.totalNetAfterTaxProgressive ? 'PFU' : 'Barème Progressif'}</p>
                 <p>Total net après impôt : ${Math.round(Math.max(bestOption.totalNetAfterTaxPFU, bestOption.totalNetAfterTaxProgressive)).toLocaleString('fr-FR')} €/an</p>
                 <p>Total droits à la retraite : ${Math.round(bestOption.totalRetirement).toLocaleString('fr-FR')} €/an</p>
+                <div class="alert alert-info mt-4">
+                    <h5>Avertissement sur les calculs de retraite</h5>
+                    <p>Les montants de retraite présentés ci-dessus sont basés sur les hypothèses suivantes :</p>
+                    <ul>
+                        <li>Une carrière complète de 43 ans au même niveau de salaire.</li>
+                        <li>Les calculs ne prennent pas en compte les évolutions potentielles de salaire ou les changements de statut au cours de la carrière.</li>
+                    </ul>
+                    <p>Ces calculs sont fournis à titre indicatif pour illustrer les mécanismes et les variations des droits sociaux selon le statut choisi (SARL ou SAS). Ils ne doivent pas être considérés comme une projection précise des droits à la retraite.</p>
+                    <p>Pour une estimation plus précise de vos droits à la retraite, nous vous recommandons de consulter un expert-comptable ou un conseiller en protection sociale.</p>
+                </div>
         `);
 
         $('#result').show();
