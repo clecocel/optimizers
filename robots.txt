@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /simulators.html
+Disallow: /sas_vs_sarl.html
+Disallow: /sas_optimizer.html
+Disallow: /sarl_optimizer.html
+Disallow: /sarl_optimizer_w_retirement.html
+Disallow: /sas_optimizer_w_retirement.html
+# Add more Disallow rules as needed for other pages
