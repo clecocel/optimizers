@@ -1,11 +1,4 @@
 $(document).ready(function() {
-    $('#salaryInput').on('input', function() {
-        let value = $(this).val().replace(/[^0-9]/g, '');
-        if (value) {
-            value = parseInt(value, 10);
-            $(this).val(value.toLocaleString('fr-FR') + ' €');
-        }
-    });
 
     $('#salaryForm').on('submit', function(e) {
         e.preventDefault();

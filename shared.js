@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('#totalCostInput').on('input', function() {
+    $('.amount-input').on('input', function() {
         let value = $(this).val().replace(/[^0-9]/g, '');
         if (value) {
             value = parseInt(value, 10);

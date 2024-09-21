@@ -1,14 +1,6 @@
 let comparisonChart = null; // Declare this variable at the top of your script, outside any function
 
 $(document).ready(function() {
-    $('#totalCostInput').on('input', function() {
-        let value = $(this).val().replace(/[^0-9]/g, '');
-        if (value) {
-            value = parseInt(value, 10);
-            $(this).val(value.toLocaleString('fr-FR') + ' €');
-        }
-    });
-
     $('#comparisonForm').on('submit', function(e) {
         e.preventDefault();
         const totalCost = parseInt($('#totalCostInput').val().replace(/[^0-9]/g, ''));
