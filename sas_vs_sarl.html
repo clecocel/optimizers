@@ -8,35 +8,10 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏦</text></svg>">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .container {
-            max-width: 800px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-top: 50px;
-            margin-bottom: 50px;
-        }
-        #totalCostInput {
-            text-align: right;
-            width: 200px;
-        }
-        .disclaimer {
-            font-style: italic;
-            color: #6c757d;
-        }
-    </style>
+    <link rel="stylesheet" href="shared.css">
 </head>
 <body>
-    <div class="container">
+    <div class="container narrow">
         <div class="alert alert-info disclaimer mb-4">
             Les calculs présentés sont à titre indicatif. Les résultats peuvent varier en fonction de votre situation personnelle et fiscale.
         </div>
@@ -78,18 +53,11 @@
         <p>Contact : optimiserdirigeant@gmail.com</p>
     </footer>
 
+    <script src="shared.js"></script>
     <script>
         let comparisonChart = null; // Declare this variable at the top of your script, outside any function
 
         $(document).ready(function() {
-            $('#totalCostInput').on('input', function() {
-                let value = $(this).val().replace(/[^0-9]/g, '');
-                if (value) {
-                    value = parseInt(value, 10);
-                    $(this).val(value.toLocaleString('fr-FR') + ' €');
-                }
-            });
-
             $('#comparisonForm').on('submit', function(e) {
                 e.preventDefault();
                 const totalCost = parseInt($('#totalCostInput').val().replace(/[^0-9]/g, ''));
@@ -98,23 +66,6 @@
                 $('#loading').show();
                 $('#error').hide();
                 compareStatuses(totalCost);
-            });
-
-            // Initialize popovers
-            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-                return new bootstrap.Popover(popoverTriggerEl, {
-                    trigger: 'focus'
-                })
-            })
-
-            // Close popover when clicking outside
-            $(document).on('click', function (e) {
-                $('[data-bs-toggle="popover"]').each(function () {
-                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                        $(this).popover('hide');
-                    }
-                });
             });
         });
 

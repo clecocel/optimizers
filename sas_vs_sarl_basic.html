@@ -6,61 +6,29 @@
     <title>Gain de rémunération en passant d'une SAS à une SARL</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏦</text></svg>">
+    <link rel="stylesheet" href="shared.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .container {
-            max-width: 800px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-top: 50px;
-            margin-bottom: 50px; /* Added margin at the bottom */
-        }
-        .form-check-input:checked {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-        }
-        #salaryInput {
-            text-align: right;
-            width: 200px; /* Reduced width of the input box */
-        }
-        .disclaimer {
-            font-style: italic;
-            color: #6c757d;
-        }
-        .coming-soon {
-            font-weight: bold;
-            color: #0d6efd;
-        }
-    </style>
+    <script src="shared.js"></script>
 </head>
 <body>
-    <div class="container">
+    <div class="container narrow">
         <div class="alert alert-info disclaimer mb-4">
             Les calculs présentés sont à titre indicatif, les gains peuvent avoir des conséquences non modélisées comme par exemple des droits (retraite, maladie, etc.) inférieurs.
             <br> Le calcul de l'imposition est réalisé sur une base simplifiée d'une personne célibataire sans enfant afin de montrer les impacts de l'imposition.
         </div>
         <h1 class="mb-4">Gain de rémunération en passant d'une SAS à une SARL</h1>
         
-        <div id="followUpQuestion" class="mt-4">
-            <p id="questionText" class="fw-bold">Quel est votre salaire brut annuel actuel en tant que dirigeant de votre SAS ?</p>
-            <div class="d-flex align-items-center">
-                <input type="text" id="salaryInput" class="form-control me-2" required>
-                <button class="btn btn-primary" id="analyzeButton">Analyser</button>
+        <form id="salaryForm">
+            <div class="mb-3">
+                <label for="salaryInput" class="form-label">Quel est votre salaire brut annuel actuel en tant que dirigeant de votre SAS ?</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" id="salaryInput" class="form-control me-2" required>
+                    <button type="submit" class="btn btn-primary" id="analyzeButton">Analyser</button>
+                </div>
             </div>
-        </div>
+        </form>
 
         <div id="result" class="mt-4" style="display: none;"></div>
-
-
     </div>
 
     <footer class="mt-4 text-center text-muted">
@@ -78,7 +46,10 @@
                 }
             });
 
-            $('#analyzeButton').on('click', submitSalary);
+            $('#salaryForm').on('submit', function(e) {
+                e.preventDefault();
+                submitSalary();
+            });
 
             // Added event listener for Enter key press
             $('#salaryInput').on('keypress', function(e) {

@@ -1,5 +1,5 @@
 User-agent: *
-Disallow: /simulators.html
+Disallow: /premium.html
 Disallow: /sas_vs_sarl.html
 Disallow: /sas_optimizer.html
 Disallow: /sarl_optimizer.html
