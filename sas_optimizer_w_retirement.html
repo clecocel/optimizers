@@ -21,7 +21,7 @@
             <div class="mb-3">
                 <label for="totalCostInput" class="form-label">Coût total disponible pour la rémunération :</label>
                 <div class="d-flex align-items-center">
-                    <input type="text" id="totalCostInput" class="form-control me-2" required>
+                    <input type="text" id="totalCostInput" class="form-control me-2 amount-input" required>
                     <button type="submit" class="btn btn-primary" id="analyzeButton">Analyser</button>
                     <div class="ms-2">
                         <button type="button" class="btn btn-link p-0" data-bs-toggle="popover" data-bs-placement="right" data-bs-html="true" data-bs-content="Si vous ne savez pas comment calculer le coût total pour une SAS, utilisez notre simulateur de base : <a href='sas_vs_sarl_basic.html'>Simulateur de base</a>">
@@ -38,7 +38,24 @@
         <div id="result" class="mt-4" style="display: none;">
             <h2>Résultats de l'analyse</h2>
             <canvas id="globalAnalysisChart"></canvas>
-            <div id="bestOption" class="mt-4"></div>
+            <div id="bestOption" class="mt-4">
+                <h3>Meilleure option globale</h3>
+                <p>Montant alloué au salaire : <span id="bestOption-salary"></span></p>
+                <p>Montant alloué aux dividendes : <span id="bestOption-dividends"></span></p>
+                <p>Meilleure option fiscale : <span id="bestOption-fiscal"></span></p>
+                <p>Total net après impôt : <span id="bestOption-totalNet"></span></p>
+                <p>Total droits à la retraite : <span id="bestOption-totalRetirement"></span></p>
+                <div class="alert alert-info mt-4">
+                    <h5>Avertissement sur les calculs de retraite</h5>
+                    <p>Les montants de retraite présentés ci-dessus sont basés sur les hypothèses suivantes :</p>
+                    <ul>
+                        <li>Une carrière complète de 43 ans au même niveau de salaire.</li>
+                        <li>Les calculs ne prennent pas en compte les évolutions potentielles de salaire ou les changements de statut au cours de la carrière.</li>
+                    </ul>
+                    <p>Ces calculs sont fournis à titre indicatif pour illustrer les mécanismes et les variations des droits sociaux selon le statut choisi (SARL ou SAS). Ils ne doivent pas être considérés comme une projection précise des droits à la retraite.</p>
+                    <p>Pour une estimation plus précise de vos droits à la retraite, nous vous recommandons de consulter un expert-comptable ou un conseiller en protection sociale.</p>
+                </div>
+            </div>
         </div>
         <div id="loading" class="mt-4" style="display: none;">
             <p>Analyse en cours, veuillez patienter...</p>
@@ -54,231 +71,7 @@
         <p>Contact : optimiserdirigeant@gmail.com</p>
     </footer>
 
-    <script>
-        let chart;
-
-        $(document).ready(function() {
-            $('#analysisForm').on('submit', function(e) {
-                e.preventDefault();
-                const totalCost = parseInt($('#totalCostInput').val().replace(/[^0-9]/g, ''));
-                $('#loading').show();
-                $('#result').hide();
-                $('#error').hide();
-                analyzeGlobal(totalCost);
-            });
-        });
-
-        function analyzeGlobal(totalCost) {
-            const apiUrl = 'https://mon-entreprise.urssaf.fr/api/v1/evaluate';
-            const results = [];
-            const delay = 500; // 500ms delay between calls
-
-            function makeApiCall(dividends) {
-                const salary = totalCost - dividends;
-                if (salary < 10000) {
-                    displayResults(results, totalCost);
-                    return;
-                }
-
-                const salaryData = {
-                    "expressions": [
-                        "salarié . rémunération . net . payé après impôt",
-                        "impôt . revenu imposable",
-                        "protection sociale . retraite . base",
-                        "protection sociale . retraite . complémentaire"
-                    ],
-                    "situation": {
-                        "dirigeant . rémunération . totale": salary,
-                        "entreprise . catégorie juridique": "'SAS'"
-                    }
-                };
-
-                $.ajax({
-                    url: apiUrl,
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(salaryData)
-                }).done(function(salaryResponse) {
-                    const netSalaryAfterTax = salaryResponse.evaluate[0].nodeValue * 12; // Convert monthly to yearly
-                    const taxableIncome = salaryResponse.evaluate[1].nodeValue * 12; // Convert monthly to yearly
-                    const baseRetirementMonthlyAmount = salaryResponse.evaluate[2].nodeValue;
-                    const complementaryRetirementAmount = salaryResponse.evaluate[3].nodeValue * 4.3 * 12; // Convert to yearly amount for 43 years
-
-                    const corporateTax = calculateCorporateTax(dividends);
-                    const grossDividends = dividends - corporateTax;
-                    const netDividendsPFU = calculateNetDividendsPFU(grossDividends);
-                    const totalNetAfterTaxPFU = netSalaryAfterTax + netDividendsPFU;
-
-                    const dividendData = {
-                        "expressions": ["bénéficiaire . dividendes . nets d'impôt"],
-                        "situation": {
-                            "impôt . foyer fiscal . revenu imposable . autres revenus imposables": taxableIncome,
-                            "impôt . méthode de calcul": "'barème standard'",
-                            "dirigeant . rémunération . net . imposable": "0 €/an",
-                            "bénéficiaire": "oui",
-                            "entreprise . catégorie juridique": "'SAS'",
-                            "bénéficiaire . dividendes . bruts": grossDividends
-                        }
-                    };
-
-                    $.ajax({
-                        url: apiUrl,
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(dividendData)
-                    }).done(function(dividendResponse) {
-                        const netDividendsProgressive = dividendResponse.evaluate[0].nodeValue;
-                        const totalNetAfterTaxProgressive = netSalaryAfterTax + netDividendsProgressive;
-
-                        results.push({
-                            salary: salary,
-                            dividends: dividends,
-                            netSalaryAfterTax: netSalaryAfterTax,
-                            netDividendsPFU: netDividendsPFU,
-                            netDividendsProgressive: netDividendsProgressive,
-                            totalNetAfterTaxPFU: totalNetAfterTaxPFU,
-                            totalNetAfterTaxProgressive: totalNetAfterTaxProgressive,
-                            baseRetirementYearlyAmount: baseRetirementMonthlyAmount * 12,
-                            complementaryRetirementAmount: complementaryRetirementAmount,
-                            totalRetirement: baseRetirementMonthlyAmount * 12 + complementaryRetirementAmount
-                        });
-
-                        // Update progress
-                        const progress = Math.round((dividends / totalCost) * 100);
-                        $('#progressBar').css('width', progress + '%').attr('aria-valuenow', progress).text(progress + '%');
-
-                        // Make the next call after a delay
-                        setTimeout(() => makeApiCall(dividends + 10000), delay);
-                    }).fail(function(jqXHR, textStatus, errorThrown) {
-                        console.error('Dividend API call failed:', textStatus, errorThrown);
-                        $('#loading').hide();
-                        $('#error').show().text('Une erreur est survenue lors de l\'analyse des dividendes. Veuillez réessayer plus tard.');
-                    });
-                }).fail(function(jqXHR, textStatus, errorThrown) {
-                    console.error('Salary API call failed:', textStatus, errorThrown);
-                    $('#loading').hide();
-                    $('#error').show().text('Une erreur est survenue lors de l\'analyse du salaire. Veuillez réessayer plus tard.');
-                });
-            }
-
-            // Start the API calls from 0€ dividends
-            $('#loading').show();
-            $('#result').hide();
-            $('#error').hide();
-            makeApiCall(0);
-        }
-
-        function calculateNetDividendsPFU(grossDividends) {
-            const socialCharges = grossDividends * 0.172; // 17.2% social charges
-            const flatTax = grossDividends * 0.128; // 12.8% flat tax on gross amount
-            return grossDividends - socialCharges - flatTax;
-        }
-
-        function displayResults(results, totalCost) {
-            const labels = results.map(r => r.salary.toLocaleString('fr-FR') + ' €');
-
-            // Destroy existing chart if it exists
-            if (chart) chart.destroy();
-
-            // Create the global analysis chart
-            const ctx = document.getElementById('globalAnalysisChart').getContext('2d');
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Meilleur total net après impôt',
-                        data: results.map(r => Math.max(r.totalNetAfterTaxPFU, r.totalNetAfterTaxProgressive)),
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                    }, {
-                        label: 'Total droits à la retraite',
-                        data: results.map(r => r.totalRetirement),
-                        borderColor: 'rgb(255, 99, 132)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Montant en euros'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Montant alloué salaire'
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                title: function(tooltipItems) {
-                                    return 'Montant alloué salaire : ' + tooltipItems[0].label;
-                                },
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(context.parsed.y);
-                                    }
-                                    return label;
-                                },
-                                afterBody: function(tooltipItems) {
-                                    const dataIndex = tooltipItems[0].dataIndex;
-                                    const data = results[dataIndex];
-                                    const bestOption = data.totalNetAfterTaxPFU > data.totalNetAfterTaxProgressive ? 'PFU' : 'Barème Progressif';
-                                    return [
-                                        '',
-                                        'Meilleure option: ' + bestOption,
-                                        'Total net après impôt (PFU): ' + new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(data.totalNetAfterTaxPFU),
-                                        'Total net après impôt (Progressif): ' + new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(data.totalNetAfterTaxProgressive),
-                                        'Montant alloué au salaire: ' + new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(data.salary),
-                                        'Montant alloué aux dividendes: ' + new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(data.dividends),
-                                        'Retraite base: ' + new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(data.baseRetirementYearlyAmount),
-                                        'Retraite complémentaire: ' + new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(data.complementaryRetirementAmount)
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            const bestOption = results.reduce((prev, current) => 
-                (Math.max(prev.totalNetAfterTaxPFU, prev.totalNetAfterTaxProgressive) > Math.max(current.totalNetAfterTaxPFU, current.totalNetAfterTaxProgressive)) ? prev : current
-            );
-
-            $('#bestOption').html(`
-                <h3>Meilleure option globale</h3>
-                <p>Montant alloué au salaire : ${bestOption.salary.toLocaleString('fr-FR')} €/an</p>
-                <p>Montant alloué aux dividendes : ${bestOption.dividends.toLocaleString('fr-FR')} €/an</p>
-                <p>Meilleure option fiscale : ${bestOption.totalNetAfterTaxPFU > bestOption.totalNetAfterTaxProgressive ? 'PFU' : 'Barème Progressif'}</p>
-                <p>Total net après impôt : ${Math.round(Math.max(bestOption.totalNetAfterTaxPFU, bestOption.totalNetAfterTaxProgressive)).toLocaleString('fr-FR')} €/an</p>
-                <p>Total droits à la retraite : ${Math.round(bestOption.totalRetirement).toLocaleString('fr-FR')} €/an</p>
-                <div class="alert alert-info mt-4">
-                    <h5>Avertissement sur les calculs de retraite</h5>
-                    <p>Les montants de retraite présentés ci-dessus sont basés sur les hypothèses suivantes :</p>
-                    <ul>
-                        <li>Une carrière complète de 43 ans au même niveau de salaire.</li>
-                        <li>Les calculs ne prennent pas en compte les évolutions potentielles de salaire ou les changements de statut au cours de la carrière.</li>
-                    </ul>
-                    <p>Ces calculs sont fournis à titre indicatif pour illustrer les mécanismes et les variations des droits sociaux selon le statut choisi (SARL ou SAS). Ils ne doivent pas être considérés comme une projection précise des droits à la retraite.</p>
-                    <p>Pour une estimation plus précise de vos droits à la retraite, nous vous recommandons de consulter un expert-comptable ou un conseiller en protection sociale.</p>
-                </div>
-        `);
-
-            $('#result').show();
-            $('#loading').hide();
-        }
-    </script>
+    <script src="sas_optimizer_w_retirement.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
