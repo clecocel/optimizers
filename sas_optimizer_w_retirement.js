@@ -113,39 +113,28 @@ function analyzeGlobal(totalCost) {
 
 function displayResults(results, totalCost) {
     const labels = results.map(r => r.salary.toLocaleString('fr-FR') + ' €');
-    const chartData = {
-        labels: labels,
-        datasets: [{
-            label: 'Meilleur total net après impôt',
-            data: results.map(r => Math.max(r.totalNetAfterTaxPFU, r.totalNetAfterTaxProgressive)),
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-        }, {
-            label: 'Total droits à la retraite',
-            data: results.map(r => r.totalRetirement),
-            borderColor: 'rgb(255, 99, 132)',
-            tension: 0.1
-        }]
-    };
 
-    createChart('globalAnalysisChart', chartData);
-
-    const bestOption = results.reduce((prev, current) => 
-        (Math.max(prev.totalNetAfterTaxPFU, prev.totalNetAfterTaxProgressive) > Math.max(current.totalNetAfterTaxPFU, current.totalNetAfterTaxProgressive)) ? prev : current
-    );
-
-    updateBestOptionDisplay(bestOption);
-
-    $('#result').show();
-    $('#loading').hide();
-}
-
-function createChart(canvasId, data) {
-    const ctx = document.getElementById(canvasId).getContext('2d');
+    // Destroy existing chart if it exists
     if (chart) chart.destroy();
+
+    // Create the global analysis chart
+    const ctx = document.getElementById('globalAnalysisChart').getContext('2d');
     chart = new Chart(ctx, {
         type: 'line',
-        data: data,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Meilleur total net après impôt',
+                data: results.map(r => Math.max(r.totalNetAfterTaxPFU, r.totalNetAfterTaxProgressive)),
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Total droits à la retraite',
+                data: results.map(r => r.totalRetirement),
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
         options: {
             responsive: true,
             scales: {
@@ -199,6 +188,15 @@ function createChart(canvasId, data) {
             }
         }
     });
+
+    const bestOption = results.reduce((prev, current) => 
+        (Math.max(prev.totalNetAfterTaxPFU, prev.totalNetAfterTaxProgressive) > Math.max(current.totalNetAfterTaxPFU, current.totalNetAfterTaxProgressive)) ? prev : current
+    );
+
+    updateBestOptionDisplay(bestOption);
+
+    $('#result').show();
+    $('#loading').hide();
 }
 
 function updateBestOptionDisplay(bestOption) {
