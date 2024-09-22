@@ -8,196 +8,235 @@
     <link rel="canonical" href="https://optimiser-remuneration-dirigeant.fr" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏦</text></svg>">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="shared.css">
 </head>
-<body>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-3">
-                <nav id="navbar" class="navbar navbar-light bg-light flex-column align-items-stretch p-3 sticky-top">
-                    <nav class="nav nav-pills flex-column">
-                        <a class="nav-link" href="#introduction">Introduction</a>
-                        <a class="nav-link" href="#optimiser-remuneration">Optimiser sa rémunération</a>
-                        <a class="nav-link" href="#optimiser-epargne">Optimiser son épargne</a>
-                        <a class="nav-link" href="#optimiser-revente">Optimiser sa revente</a>
-                        <a class="nav-link btn btn-primary mt-3 fw-bold" href="simulators.html" style="background-color: #e9ecef;">Voir les simulateurs<i class="fas fa-calculator ms-1"></i></a>
-                    </nav>
-                </nav>
-            </div>
-            <div class="col-lg-9">
-                <h1 class="mb-4">Optimisation fiscale et patrimoniale pour chefs d'entreprise - La holding</h1>
+<body class="min-vh-100 bg-gradient">
+    <header class="bg-white shadow-sm sticky-top">
+        <div class="container-fluid px-4 py-3 d-flex justify-content-between align-items-center">
+            <h1 class="h3 fw-bold text-primary mb-0">OptiRém</h1>
+            <nav class="d-none d-md-flex">
+                <a href="#introduction" class="nav-link me-3">Introduction</a>
+                <a href="#optimiser-remuneration" class="nav-link me-3">Optimiser sa rémunération</a>
+                <a href="#optimiser-epargne" class="nav-link me-3">Optimiser son épargne</a>
+                <a href="#optimiser-revente" class="nav-link me-3">Optimiser sa revente</a>
+                <a href="simulators.html" class="btn btn-primary">Voir les simulateurs</a>
+            </nav>
+            <button class="btn btn-outline-primary d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sideMenuLabel">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <nav class="d-flex flex-column">
+                <a href="#introduction" class="nav-link mb-2" data-bs-dismiss="offcanvas">Introduction</a>
+                <a href="#optimiser-remuneration" class="nav-link mb-2" data-bs-dismiss="offcanvas">Optimiser sa rémunération</a>
+                <a href="#optimiser-epargne" class="nav-link mb-2" data-bs-dismiss="offcanvas">Optimiser son épargne</a>
+                <a href="#optimiser-revente" class="nav-link mb-2" data-bs-dismiss="offcanvas">Optimiser sa revente</a>
+                <a href="simulators.html" class="btn btn-primary mt-2">Voir les simulateurs</a>
+            </nav>
+        </div>
+    </div>
+
+    <main class="container px-4 py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <h1 class="text-dark mb-4">
+                    Optimisation fiscale et patrimoniale pour chefs d'entreprise - La holding
+                </h1>
                 
-                <section id="introduction">
-                    <h2>Introduction</h2>
-                    <p>
+                <section id="introduction" class="mb-5">
+                    <h2 class="h3 fw-semibold text-dark mb-3">Introduction</h2>
+                    <p class="text-secondary mb-3">
                         En tant que chef d'entreprise, la création d'une holding peut s'avérer être une stratégie particulièrement avantageuse pour optimiser à la fois votre rémunération, votre épargne et la gestion de la potentielle vente de vos parts de société opérationnelle.
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         L'un des principaux intérêts de la holding réside dans la possibilité de réaliser un apport-cession des parts de la société opérationnelle que l'on dirige. Ce mécanisme permet de réduire l'imposition sur la plus-value réalisée lors de la vente de vos parts de société opérationnelle.
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         De plus, la holding permet une gestion plus fine de votre rémunération de dirigeant, en vous offrant la possibilité de choisir le montant à vous verser tout en réinvestissant directement le reste via la holding, sans subir les cotisations et impositions liées à une personne physique.
                     </p>
-                    <p>
+                    <p class="text-secondary">
                         Enfin, elle permet de moduler entre salaire et dividendes afin de maximiser votre rémunération à montant équivalent pour la société.
                     </p>
                 </section>
 
-                <section id="optimiser-remuneration">
-                    <h2>Optimiser sa rémunération</h2>
-                    <p>
+                <section id="optimiser-remuneration" class="mb-5">
+                    <h2 class="h3 fw-semibold text-dark mb-3">Optimiser sa rémunération</h2>
+                    <p class="text-secondary mb-3">
                         De nombreux dirigeants se rémunèrent via leur société opérationnelle directement sous forme de salaire. La création d'une holding peut néanmoins offrir des leviers d'optimisation de leur rémunération intéressants. Pour cela il convient de s'intéresser au statut de la société opérationnelle, à la répartition du capital de la société opérationnelle (le dirigeant est-il seul, a-t-il un ou des associés), à l'objectif de rémunération du dirigeant et à sa sensibilité aux droits sociaux comme par exemple la retraite.
                     </p>
-                    <h3>SAS ou SARL ?</h3>
-                    <p>
+                    <h3 class="h4 fw-semibold text-dark mb-2">SAS ou SARL ?</h3>
+                    <p class="text-secondary mb-3">
                         L'un des premiers leviers d'optimisation pour un dirigeant est la gestion de son salaire. Selon que vous choisissez de vous rémunérer via une SAS (Société par Actions Simplifiée) ou une SARL (Société à Responsabilité Limitée), les cotisations sociales seront différentes. En SAS, les cotisations sont plus élevées, mais ouvrent droit à une meilleure retraite. En SARL, les cotisations sont moins élevées, mais la retraite sera moins importante.
                     </p>
 
-                    <p>
+                    <p class="text-secondary mb-3">
                         Le dirigeant associé d'une société opérationnelle de type SAS peut par exemple augmenter sa rémunération facilement en créant une holding sous forme de SARL afin de profiter de cotisations sociales réduites et d'augmenter le salaire net. Dans ce cadre, la holding SARL (ou EURL) facture la société opérationnelle et le dirigeant se verse le salaire via la holding. Cette technique très simple peut permettre d'augmenter le salaire net du dirigeant de 10% à 30%.
                     </p>
 
-                    <p class="d-flex align-items-center">
-                        <strong class="me-3">Simuler vos gains potentiels en passant par une SARL avec notre simulateur :</strong>
-                        <a href="sas_vs_sarl_basic.html" class="btn btn-primary">→ Simuler</a>
-                    </p>
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="fw-semibold me-3">Simuler vos gains potentiels en passant par une SARL avec notre simulateur :</span>
+                        <a href="sas_vs_sarl_basic.html" class="btn btn-primary">Simuler</a>
+                    </div>
 
 
-                    <h3>Optimiser les dividendes</h3>
-                    <p>
+                    <h3 class="h4 fw-semibold text-dark mb-2">Optimiser les dividendes</h3>
+                    <p class="text-secondary mb-3">
                         Les dividendes constituent un autre levier d'optimisation de votre rémunération. En effet, vous pouvez choisir de ne pas vous rémunérer en totalité en salaire mais plutôt de vous rémunérer en partie via des dividendes. L'intérêt ici est donc l'optimisation du revenu net après impôt du dirigeant.
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         Tout d'abord, dans ce cadre la holding va donc générer un bénéfice. Celui-ci sera imposable à l'impôt sur les sociétés (15% jusqu'à 42 500€, puis 25% au delà). Ensuite, ce qui reste pourra être versé au dirigeant sous forme de dividendes.
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         Un point important ici est que l'intérêt des dividendes réside dans leur imposition. Tout d'abord, les dividendes sont soumis à des prélèvements sociaux de 17.2%. <strong>Attention toutefois : en SARL, les dividendes soumis aux prélèvements sociaux de 17.2% sont limités à 10% du capital social.</strong> Au-delà de ce seuil, la part des dividendes excédentaires est soumise aux cotisations sociales (plus importantes, autour de 40%).
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         Ensuite, deux régimes d'imposition soffrent à vous : le Prélèvement Forfaitaire Unique (PFU) ou le barème progressif de l'impôt sur le revenu. Le PFU ajoute aux 17.2% de prélèvements sociaux un impôt (flat tax) de 12,8% pour aboutir à 30%. L'option du barême progressif va faire rentrer les montants des dividendes dans le revenu imposable global et sera donc soumis au barême après un abattement de 40%.
                     </p>
-                    <p>Prenons un exemple chiffré pour mettre en musique tous ces calculs :</p>
-                    <ul>
-                        <li>La société génère 50 000€ de bénéfice</li>
-                        <li>L'impôt sur les sociétés s'élève donc à 15% * 42 500 + 25% * 7 500 = 8 250€</li>
-                        <li>Le dirigeant verse ensuite la somme restante en dividendes (soit 41 750€)
-                            <ul>
-                                <li>S'il choisit le PFU, il recevra donc 41 750€ * 70% = 29 225€</li>
-                                <li>S'il choisit le barême progressif (et en supposant qu'il n'ait aucune autre rémunération par ailleurs), il recevra 33 698€ (voir ce <a href="https://mon-entreprise.urssaf.fr/simulateurs/dividendes">simulateur</a> bien pratique pour calculer les dividendes nets perçus selon votre situation)</li>
+                    <p class="text-secondary mb-3">Prenons un exemple chiffré pour mettre en musique tous ces calculs :</p>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item">La société génère 50 000€ de bénéfice</li>
+                        <li class="list-group-item">L'impôt sur les sociétés s'élève donc à 15% * 42 500 + 25% * 7 500 = 8 250€</li>
+                        <li class="list-group-item">Le dirigeant verse ensuite la somme restante en dividendes (soit 41 750€)
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">S'il choisit le PFU, il recevra donc 41 750€ * 70% = 29 225€</li>
+                                <li class="list-group-item">S'il choisit le barême progressif (et en supposant qu'il n'ait aucune autre rémunération par ailleurs), il recevra 33 698€ (voir ce <a href="https://mon-entreprise.urssaf.fr/simulateurs/dividendes" class="text-primary">simulateur</a> bien pratique pour calculer les dividendes nets perçus selon votre situation)</li>
                             </ul>
                         </li>
                     </ul>
-                    <p>
+                    <p class="text-secondary mb-3">
                         De manière schématique, le barême progressif sera plus avantageux lorsque vos revenus totaux ne sont pas trop élevés, puis le PFU deviendra plus intéressant lorsque vos revenus globaux augmentent.
                         <strong>Enfin, il est important de garder en tête que les dividendes ne donnent aucun droit à la retraite.</strong>
                     </p>
 
-                    <p>
+                    <p class="text-secondary mb-3">
                         Si vous souhaitez modéliser la répartition idéale vous pouvez utiliser nos simulateurs Premium qui permettent de déterminer la meilleure option d'imposition des dividendes, mais aussi de vérifier l'impact sur les droits à la retraite de la répartition choisie. 
                     </p>
-                    <div class="mb-4">
-                        <a href="simulators.html" class="btn btn-primary">→ Simulateurs Premium</a>
-                    </div>
+                    <a href="simulators.html" class="btn btn-primary mb-3">Simulateurs Premium</a>
                     
                 </section>
 
-                <section id="optimiser-epargne">
-                    <h2>Optimiser son épargne</h2>
-                    <p>
+                <section id="optimiser-epargne" class="mb-5">
+                    <h2 class="h3 fw-semibold text-dark mb-3">Optimiser son épargne</h2>
+                    <p class="text-secondary mb-3">
                         L'un des avantages significatifs de la holding est la possibilité de ne pas sortir l'intégralité de votre rémunération sous forme de salaire ou de dividendes. En effet, vous pouvez choisir de laisser une partie des bénéfices au sein de la holding pour les réinvestir directement. Cela permet de capitaliser sur ces fonds tout en évitant les impositions et cotisations personnelles.
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         <strong>Exemple chiffré :</strong>
                         <br/>Imaginons que votre entreprise réalise un bénéfice de 100 000 €. Plutôt que de vous verser l'intégralité de ce montant en salaire ou en dividendes, et de subir une imposition conséquente, vous pouvez décider de n'en verser qu'une partie en salaire, par exemple 50 000 €, et de réinvestir les 50 000 € restants via la holding. Ces fonds pourront être utilisés pour investir dans d'autres entreprises, acquérir de l'immobilier ou financer des projets, le tout sans subir de taxation immédiate.
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         Dans ce cas, le montant disponible pour être investi est donc de 50 000 € - l'impôt sur les sociétés qui est de 15% sur les 42 500€ premiers euros de bénéfices, puis 25%. C'est donc un montant de 50 000 € - 6 375 € - 1 875 € = 41 750 € qui sera disponible pour être investi. Ce montant est bien supérieur à ce qui serait disponible si le dirigeant avait choisi de "sortir" sous forme de rémunération ou de dividendes ce montant (voir par exemple le calcul sur les dividendes ci-dessus).
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         La holding peut donc faire office d'enveloppe capitalisante pour loger des investissements et les faire fructifier avant de les avoir soumis à l'imposition sur le revenu. Il convient néanmoins de souligner que cela ne permet d'effacer totalement l'imposition mais de la différer au versement effectif des sommes au dirigeant. C'est donc un moyen de mettre plus d'argent au travail durant la phase de création patrimoniale.
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         Il convient donc de déterminer le montant que le dirigeant souhaite se verser selon ses besoins, et de garder le reste au sein de la holding. Pour déterminer le montant à allouer à la rémunération et la meilleure manière de le verser (salaire et/ou dividendes), vous pouvez utiliser les simulateurs Premium qui permettent de calculer l'impact de cotisations et de l'imposition sur le montant perçu.
                     </p>
-                    <div class="mb-4">
-                        <a href="simulators.html" class="btn btn-primary">→ Simulateurs Premium</a>
-                    </div>
+                    <a href="simulators.html" class="btn btn-primary mb-3">Simulateurs Premium</a>
                 </section>
 
-                <section id="optimiser-revente">
-                    <h2>Optimiser sa revente</h2>
-                    <p>
+                <section id="optimiser-revente" class="mb-5">
+                    <h2 class="h3 fw-semibold text-dark mb-3">Optimiser sa revente</h2>
+                    <p class="text-secondary mb-3">
                         Lorsque vous envisagez de vendre vos parts de société, la holding offre une solution fiscale particulièrement avantageuse via le mécanisme de l'apport-cession.
                     </p>
-                    <p>
+                    <p class="text-secondary mb-3">
                         En apportant vos parts à une holding avant de les céder, vous pouvez différer l'imposition sur la plus-value. Cela vous permet de disposer immédiatement de liquidités pour réinvestir dans de nouveaux projets ou pour diversifier vos investissements, tout en optimisant la fiscalité de l'opération.
                     </p>
-                    <p>La mécanique est la suivante :</p>
-                    <ol>
-                        <li>Apport des titres à une holding :
-                            <ul>
-                                <li>L'entrepreneur ou l'investisseur crée une holding et apporte les titres de sa société opérationnelle à cette holding en échange de nouvelles actions de la holding.</li>
-                                <li>Cette opération d'apport est généralement réalisée en neutralité fiscale, c'est-à-dire sans imposition immédiate des plus-values latentes sur les titres apportés, grâce au régime fiscal dit du report d'imposition.</li>
+                    <p class="text-secondary mb-3">La mécanique est la suivante :</p>
+                    <ol class="list-group list-group-numbered mb-3">
+                        <li class="list-group-item">Apport des titres à une holding :
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">L'entrepreneur ou l'investisseur crée une holding et apporte les titres de sa société opérationnelle à cette holding en échange de nouvelles actions de la holding.</li>
+                                <li class="list-group-item">Cette opération d'apport est généralement réalisée en neutralité fiscale, c'est-à-dire sans imposition immédiate des plus-values latentes sur les titres apportés, grâce au régime fiscal dit du report d'imposition.</li>
                             </ul>
                         </li>
-                        <li>Cession des titres par la holding :
-                            <ul>
-                                <li>Une fois les titres apportés à la holding, cette dernière peut décider de vendre les titres de la société fille.</li>
-                                <li>Si la holding cède les titres, elle réalise une plus-value, mais grâce à certains régimes fiscaux, notamment celui des sociétés mères-filles ou des plus-values à long terme, cette plus-value peut bénéficier d'une imposition réduite.</li>
+                        <li class="list-group-item">Cession des titres par la holding :
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Une fois les titres apportés à la holding, cette dernière peut décider de vendre les titres de la société fille.</li>
+                                <li class="list-group-item">Si la holding cède les titres, elle réalise une plus-value, mais grâce à certains régimes fiscaux, notamment celui des sociétés mères-filles ou des plus-values à long terme, cette plus-value peut bénéficier d'une imposition réduite.</li>
                             </ul>
                         </li>
-                        <li>Réinvestissement :
-                            <ul>
-                                <li>Si la holding détient les parts de la société opérationnelle depuis moins de 3 ans au moment de la vente des parts de celle-ci les fonds issus de la cession doivent être réinvestis dans des activités économiques (création, rachat d'entreprises, etc.) dans un délai prescrit (en général deux ans) afin de faire perdurer le report de l'imposition sur la plus-value.</li>
-                                <li>Si la holding détient les parts de la société opérationnelle depuis plus de 3 ans, le report d'imposition n'est pas soumis à conditions.</li>
+                        <li class="list-group-item">Réinvestissement :
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Si la holding détient les parts de la société opérationnelle depuis moins de 3 ans au moment de la vente des parts de celle-ci les fonds issus de la cession doivent être réinvestis dans des activités économiques (création, rachat d'entreprises, etc.) dans un délai prescrit (en général deux ans) afin de faire perdurer le report de l'imposition sur la plus-value.</li>
+                                <li class="list-group-item">Si la holding détient les parts de la société opérationnelle depuis plus de 3 ans, le report d'imposition n'est pas soumis à conditions.</li>
                             </ul>
                         </li>
                     </ol>
 
-                <p>
+                <p class="text-secondary mb-3">
                     C'est donc un moyen très efficace de générer un patrimoine important en investissant un montant avant imposition (comparable au système d'épargne décrit précédemment).
                 </p>
                 </section>
 
-                <section id="simulateur">
-                    <h2>Simulateurs</h2>
-                    <p>
+                <section id="simulateur" class="mb-5">
+                    <h2 class="h3 fw-semibold text-dark mb-3">Simulateurs</h2>
+                    <p class="text-secondary mb-3">
                         Utilisez nos simulateurs pour optimiser votre création patrimoniale.</p>
-                    <div class="mb-4">
-                        <a href="simulators.html" class="btn btn-primary">→ Voir les simulateurs</a>
-                    </div>
+                    <a href="simulators.html" class="btn btn-primary">Voir les simulateurs</a>
                 </section>
             </div>
         </div>
-    </div>
+    </main>
 
-    <footer class="mt-4 text-center text-muted">
-        <p>Contact : optimiserdirigeant@gmail.com</p>
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p class="mb-0">Contact : optimiserdirigeant@gmail.com</p>
+        </div>
     </footer>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        $(document).ready(function() {
-            var scrollSpy = new bootstrap.ScrollSpy(document.body, {
-                target: '#navbar',
-                offset: 100 // Adjust this value as needed
-            });
+        // Function to update active nav link
+        function updateActiveNavLink() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
 
-            // Update ScrollSpy on window resize
-            $(window).on('resize', function() {
-                scrollSpy.refresh();
-            });
-
-            // Smooth scrolling for anchor links
-            $('a[href^="#"]').on('click', function(e) {
-                e.preventDefault();
-                var target = $(this.getAttribute('href'));
-                if (target.length) {
-                    $('html, body').stop().animate({
-                        scrollTop: target.offset().top - 100 // Adjust this value to match the offset
-                    }, 300);
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 60 && window.pageYOffset < sectionTop + sectionHeight - 60) {
+                    const id = section.getAttribute('id');
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        }
+                    });
                 }
+            });
+        }
+
+        // Update active nav link on scroll and on page load
+        window.addEventListener('scroll', updateActiveNavLink);
+        window.addEventListener('load', updateActiveNavLink);
+
+        // Smooth scroll function and close mobile menu
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Close the mobile menu
+                const mobileMenu = document.getElementById('sideMenu');
+                const bsOffcanvas = bootstrap.Offcanvas.getInstance(mobileMenu);
+                if (bsOffcanvas) {
+                    bsOffcanvas.hide();
+                }
+
+                // Smooth scroll to the target section
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
         });
     </script>

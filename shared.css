@@ -26,14 +26,14 @@ body {
     color: #6c757d;
 }
 .sticky-top {
-    top: 20px;
+    top: 0;
 }
 .nav-link {
-    color: #495057;
+    color: #4a4a4a;
+    transition: color 0.3s ease;
 }
-.nav-link.active {
-    font-weight: bold;
-    color: #007bff;
+.nav-link:hover, .nav-link.active {
+    color: #0066cc;
 }
 .form-check-input:checked {
     background-color: #0d6efd;
@@ -61,4 +61,61 @@ body {
 }
 .simulator-item:hover {
     background-color: #e9ecef;
+}
+
+.bg-gradient {
+    background: linear-gradient(to bottom right, #e6f3ff, #e6e6ff);
+}
+
+.text-primary {
+    color: #0066cc !important;
+}
+
+.btn-primary {
+    background-color: #0066cc;
+    border-color: #0066cc;
+}
+
+.btn-primary:hover {
+    background-color: #0052a3;
+    border-color: #0052a3;
+}
+
+.btn-outline-primary {
+    color: #0066cc;
+    border-color: #0066cc;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0066cc;
+    color: white;
+}
+
+.text-secondary {
+    color: #4a4a4a !important;
+}
+
+.text-secondary:hover {
+    color: #4a4a4a !important;
+}
+
+@media (max-width: 767.98px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+}
+
+h1.h3 {
+    font-size: 1.5rem; /* Adjust this value as needed */
+}
+
+footer .container {
+    background-color: transparent;
+    box-shadow: none;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+footer p {
+    margin-bottom: 0;
 }
