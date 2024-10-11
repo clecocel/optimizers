@@ -26,7 +26,9 @@ function analyzeOptimization(totalCost) {
         const salaryData = {
             "expressions": [
                 "dirigeant . rémunération . net . après impôt",
-                "impôt . revenu imposable"
+                "impôt . revenu imposable",
+                "protection sociale . retraite . base",
+                "protection sociale . retraite . complémentaire . RCI"
             ],
             "situation": {
                 "entreprise . imposition": "'IS'",
@@ -44,6 +46,8 @@ function analyzeOptimization(totalCost) {
         }).done(function(salaryResponse) {
             const netSalaryAfterTax = salaryResponse.evaluate[0].nodeValue;
             const taxableIncome = salaryResponse.evaluate[1].nodeValue;
+            const baseRetirementMonthlyAmount = salaryResponse.evaluate[2].nodeValue;
+            const complementaryRetirementAmount = salaryResponse.evaluate[3].nodeValue * 43;
 
             const corporateTax = calculateCorporateTax(dividends);
             const grossDividends = dividends - corporateTax;
@@ -78,7 +82,9 @@ function analyzeOptimization(totalCost) {
                     netDividendsPFU: netDividendsPFU,
                     netDividendsProgressive: netDividendsProgressive,
                     totalNetAfterTaxPFU: totalNetAfterTaxPFU,
-                    totalNetAfterTaxProgressive: totalNetAfterTaxProgressive
+                    totalNetAfterTaxProgressive: totalNetAfterTaxProgressive,
+                    baseRetirementYearlyAmount: baseRetirementMonthlyAmount * 12,
+                    complementaryRetirementAmount: complementaryRetirementAmount
                 });
 
                 // Update progress
@@ -216,6 +222,8 @@ function displayResults(results, totalCost) {
     $('#pfu-net-salary').text(Math.round(bestOptionPFU.netSalaryAfterTax).toLocaleString('fr-FR') + ' €');
     $('#pfu-net-dividends').text(Math.round(bestOptionPFU.netDividendsPFU).toLocaleString('fr-FR') + ' €');
     $('#pfu-total-net').text(Math.round(bestOptionPFU.totalNetAfterTaxPFU).toLocaleString('fr-FR') + ' €');
+    $('#pfu-base-retirement').text(Math.round(bestOptionPFU.baseRetirementYearlyAmount).toLocaleString('fr-FR') + ' €/an');
+    $('#pfu-complementary-retirement').text(Math.round(bestOptionPFU.complementaryRetirementAmount).toLocaleString('fr-FR') + ' €/an');
 
     // Update Progressive values
     $('#progressive-salary').text(bestOptionProgressive.salary.toLocaleString('fr-FR') + ' €');
@@ -223,6 +231,8 @@ function displayResults(results, totalCost) {
     $('#progressive-net-salary').text(Math.round(bestOptionProgressive.netSalaryAfterTax).toLocaleString('fr-FR') + ' €');
     $('#progressive-net-dividends').text(Math.round(bestOptionProgressive.netDividendsProgressive).toLocaleString('fr-FR') + ' €');
     $('#progressive-total-net').text(Math.round(bestOptionProgressive.totalNetAfterTaxProgressive).toLocaleString('fr-FR') + ' €');
+    $('#progressive-base-retirement').text(Math.round(bestOptionProgressive.baseRetirementYearlyAmount).toLocaleString('fr-FR') + ' €/an');
+    $('#progressive-complementary-retirement').text(Math.round(bestOptionProgressive.complementaryRetirementAmount).toLocaleString('fr-FR') + ' €/an');
 
     // Update best fiscal option
     $('#best-fiscal-option').text(bestOptionPFU.totalNetAfterTaxPFU > bestOptionProgressive.totalNetAfterTaxProgressive ? 'PFU' : 'Barème Progressif');
